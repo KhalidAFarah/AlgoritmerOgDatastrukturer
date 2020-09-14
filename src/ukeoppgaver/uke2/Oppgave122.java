@@ -1,5 +1,7 @@
 package ukeoppgaver.uke2;
 
+import ukeoppgaver.resources.Tabell;
+
 public class Oppgave122 {
     /*------------------------1.2.2------------------------*/
     //Oppgave 1 lagde Tabell klassen
