@@ -1,17 +1,19 @@
 package ukeoppgaver;
 
-import ukeoppgaver.resources.Tabell;
-import ukeoppgaver.uke2.*;
-import ukeoppgaver.uke3.Oppgave134;
+import eksempler.TowerOfHanoi;
+import ukeoppgaver.eksempelKlasser.*;
+import ukeoppgaver.resources.*;
+import ukeoppgaver.*;
+import ukeoppgaver.uke4.uke4Main;
+import ukeoppgaver.uke6.uke6Main;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 public class Main {
-    public static void main(String[] args){
 
-        String[] s = {"Per","Kari","Ole","Anne","Ali","Eva"};
-        Tabell.innsettingssortering(s);
-        System.out.println(Arrays.toString(s));  // [Ali, Anne, Eva, Kari, Ole, Per]
+    public static void main(String[] args){
+        uke6Main.main();
 
     }
 

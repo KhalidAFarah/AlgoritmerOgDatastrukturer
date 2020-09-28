@@ -1,6 +1,10 @@
 package ukeoppgaver.resources;
 
+import ukeoppgaver.eksempelKlasser.Komparator;
+
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 public class Tabell { // Samleklasse for tabellmetoder
@@ -584,5 +588,191 @@ public class Tabell { // Samleklasse for tabellmetoder
 
             a[j + 1] = verdi;      // j + 1 er rett sortert plass
         }
+    }
+    public static <T> void innsettingssortering(T[] a, Komparator<? super T> c)
+    {
+        for (int i = 1; i < a.length; i++)  // starter med i = 1
+        {
+            T verdi = a[i];        // verdi er et tabellelemnet
+            int  j = i - 1;        // j er en indeks
+
+            // sammenligner og forskyver:
+            for (; j >= 0 && c.compare(verdi,a[j]) < 0 ; j--) a[j+1] = a[j];
+
+            a[j + 1] = verdi;      // j + 1 er rett sortert plass
+        }
+    }
+    public static <T> int maks(T[] a, Komparator<? super T> c) {
+        T maks = a[0];
+        int maksIndex = 0;
+        for (int i = 1; i < a.length; i++)  // starter med i = 1
+        {
+            if(c.compare(maks, a[i]) < 0){
+                maks = a[i];
+                maksIndex = i;
+            }
+        }
+        return maksIndex;
+    }
+    public static <T> void innsettingssortering2(T[] a, Comparator<? super T> c)
+    {
+        for (int i = 1; i < a.length; i++)  // starter med i = 1
+        {
+            T verdi = a[i];        // verdi er et tabellelemnet
+            int  j = i - 1;        // j er en indeks
+
+            // sammenligner og forskyver:
+            for (; j >= 0 && c.compare(verdi,a[j]) < 0 ; j--) a[j+1] = a[j];
+
+            a[j + 1] = verdi;      // j + 1 er rett sortert plass
+        }
+    }
+    public static <T> int maksComparator(T[] a, Comparator<? super T> c)
+    {
+        return maksComparator(a, 0, a.length, c);  // kaller metoden under
+    }
+
+    public static <T> int maksComparator(T[] a, int fra, int til, Comparator<? super T> c)
+    {
+        fratilKontroll(a.length,fra,til);
+
+        if (fra == til) throw new NoSuchElementException
+                ("fra(" + fra + ") = til(" + til + ") - tomt tabellintervall!");
+
+        int m = fra;                // indeks til største verdi
+        T maksverdi = a[fra];       // største verdi
+
+        for (int i = fra + 1; i < til; i++)   // går gjennom intervallet
+        {
+            if (c.compare(a[i],maksverdi) > 0)  // bruker komparatoren
+            {
+                maksverdi = a[i];     // største verdi oppdateres
+                m = i;                // indeks til største verdi oppdateres
+            }
+        }
+        return m;                 // posisjonen til største verdi
+
+    }  // maks
+
+    public static <T> int minComparator(T[] a, int fra, int til, Comparator<? super T> c)
+    {
+        fratilKontroll(a.length,fra,til);
+
+        if (fra == til) throw new NoSuchElementException
+                ("fra(" + fra + ") = til(" + til + ") - tomt tabellintervall!");
+
+        int m = fra;                // indeks til største verdi
+        T minverdi = a[fra];       // største verdi
+
+        for (int i = fra + 1; i < til; i++)   // går gjennom intervallet
+        {
+            if (c.compare(a[i],minverdi) < 0)  // bruker komparatoren
+            {
+                minverdi = a[i];     // største verdi oppdateres
+                m = i;                // indeks til største verdi oppdateres
+            }
+        }
+        return m;                 // posisjonen til største verdi
+
+    }  // min
+
+    public static <T> int minComparator(T[] a, Comparator<? super T> c)
+    {
+       return minComparator(a, 0, a.length, c);                // posisjonen til største verdi
+    }  // min
+
+    public static <T> void utvalgssorteringComparator(T[] a,  Comparator<? super T> c)
+    {
+        for (int i = 0; i < a.length - 1; i++)
+            bytt(a, i, minComparator(a, i, a.length, c));  // to hjelpemetoder
+    }
+
+    public static <T> int binærsøkComparator(T[] a, int fra, int til, T verdi, Comparator<? super T> c)
+    {
+        Tabell.fratilKontroll(a.length,fra,til);  // se Programkode 1.2.3 a)
+        int v = fra, h = til - 1;    // v og h er intervallets endepunkter
+
+        while (v <= h)  // fortsetter så lenge som a[v:h] ikke er tom
+        {
+            int m = (v + h)/2;     // heltallsdivisjon - finner midten
+            T midtverdi = a[m];  // hjelpevariabel for  midtverdien
+
+            if (c.compare(midtverdi, verdi) > 0) v = m + 1;        // verdi i a[m+1:h]
+            else if (c.compare(midtverdi, verdi) < 0) h = m - 1;   // verdi i a[v:m-1]
+            else return m;                           // funnet
+        }
+
+        return -(v + 1);   // ikke funnet, v er relativt innsettingspunkt
+    }
+    public static <T> int binærsøkComparator(T[] a, T verdi, Comparator<? super T> c)
+    {
+        return binærsøkComparator(a, 0, a.length, verdi, c);
+    }
+
+    private static <T> int parter0(T[] a, int v, int h, T skilleverdi, Comparator<? super T> c)
+    {
+        while (true)                                  // stopper når v > h
+        {
+            while (v <= h && c.compare(a[v], skilleverdi) > 0) v++;   // h er stoppverdi for v
+            while (v <= h && c.compare(a[v], skilleverdi) < 0) h--;  // v er stoppverdi for h
+
+            if (v < h) bytt(a,v++,h--);                 // bytter om a[v] og a[h]
+            else  return v;  // a[v] er nåden første som ikke er mindre enn skilleverdi
+        }
+    }
+    private static <T> int sParter0(T[] a, int v, int h, int indeks, Comparator<? super T> c)
+    {
+        bytt(a, indeks, h);           // skilleverdi a[indeks] flyttes bakerst
+        int pos = parter0(a, v, h - 1, a[h], c);  // partisjonerer a[v:h - 1]
+        bytt(a, pos, h);              // bytter for å få skilleverdien på rett plass
+        return pos;                   // returnerer posisjonen til skilleverdien
+    }
+    private static <T> void kvikksortering0(T[] a, int v, int h, Comparator<? super T> c)  // en privat metode
+    {
+        if (v >= h) return;  // a[v:h] er tomt eller har maks ett element
+        int k = sParter0(a, v, h, (v + h)/2, c);  // bruker midtverdien
+        kvikksortering0(a, v, k - 1, c);     // sorterer intervallet a[v:k-1]
+        kvikksortering0(a, k + 1, h, c);     // sorterer intervallet a[k+1:h]
+    }
+
+    public static <T> void kvikksortering(T[] a, int fra, int til, Comparator<? super T> c) // a[fra:til>
+    {
+        fratilKontroll(a.length, fra, til);  // sjekker når metoden er offentlig
+        kvikksortering0(a, fra, til - 1, c);  // v = fra, h = til - 1
+    }
+
+    public static <T> void kvikksortering(T[] a, Comparator<? super T> c)   // sorterer hele tabellen
+    {
+        kvikksortering0(a, 0, a.length - 1, c);
+    }
+
+    private static <T> void flett(T[] a, T[] b, int fra, int m, int til, Comparator<? super T> c)
+    {
+        int n = m - fra;                // antall elementer i a[fra:m>
+        System.arraycopy(a,fra,b,0,n);  // kopierer a[fra:m> over i b[0:n>
+
+        int i = 0, j = m, k = fra;      // løkkevariabler og indekser
+
+        while (i < n && j < til)        // fletter b[0:n> og a[m:til> og
+        {                               // legger resultatet i a[fra:til>
+            a[k++] = c.compare(b[i], a[j]) > 0? b[i++] : a[j++];
+        }
+
+        while (i < n) a[k++] = b[i++];  // tar med resten av b[0:n>
+    }
+    private static <T> void flettesortering(T[] a, T[] b, int fra, int til, Comparator<? super T> c)
+    {
+        if (til - fra <= 1) return;   // a[fra:til> har maks ett element
+        int m = (fra + til)/2;        // midt mellom fra og til
+
+        flettesortering(a,b,fra,m, c);   // sorterer a[fra:m>
+        flettesortering(a,b,m,til, c);   // sorterer a[m:til>
+
+        if (c.compare(a[m-1], a[m]) > 0) flett(a,b,fra,m,til, c);  // fletter a[fra:m> og a[m:til>
+    }
+    public static <T> void flettesortering(T[] a, Comparator<? super T> c)
+    {
+        T[] b = Arrays.copyOf(a, a.length/2);   // en hjelpetabell for flettingen
+        flettesortering(a,b,0,a.length, c);          // kaller metoden over
     }
 }
