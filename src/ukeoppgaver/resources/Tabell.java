@@ -45,6 +45,22 @@ public class Tabell { // Samleklasse for tabellmetoder
 
         return a;                        // permutasjonen returneres
     }
+
+    public static Integer[] randPermInteger(int n)  // en effektiv versjon
+    {
+        Random r = new Random();         // en randomgenerator
+        Integer[] a = new Integer[n];            // en tabell med plass til n tall
+
+        Arrays.setAll(a, i -> i + 1);    // legger inn tallene 1, 2, . , n
+
+        for (int k = n - 1; k > 0; k--)  // løkke som går n - 1 ganger
+        {
+            int i = r.nextInt(k+1);        // en tilfeldig tall fra 0 til k
+            bytt(a,k,i);                   // bytter om
+        }
+
+        return a;                        // permutasjonen returneres
+    }
     // Metoden randPerm(int[] a)                 Programkode 1.1.8 f)
     public static void randPerm(int[] a)  // stokker om a
     {
@@ -67,6 +83,7 @@ public class Tabell { // Samleklasse for tabellmetoder
             bytt(a,k,i);
         }
     }
+
 
     // Metoden maks(int[] a, int fra, int til)   Programkode 1.2.1 b)
     public static int maks(int[] a, int fra, int til)
@@ -774,5 +791,49 @@ public class Tabell { // Samleklasse for tabellmetoder
     {
         T[] b = Arrays.copyOf(a, a.length/2);   // en hjelpetabell for flettingen
         flettesortering(a,b,0,a.length, c);          // kaller metoden over
+    }
+
+    public static <T> void sorter(Kø<T> kø, Stakk<T> stakk, Comparator<? super T> c) {
+        int n = kø.antall();
+        int antall = n;
+        for (int i = 0; i < kø.antall(); i++) {
+            T valgt = kø.taUt();
+            for (int j = 1; j < antall; j++) {
+                T temp = kø.taUt();
+                int k = c.compare(valgt, temp);
+                if (k <= 0) {
+                    stakk.leggInn(valgt);
+                    valgt = temp;
+                } else {
+                    stakk.leggInn(temp);
+                }
+            }
+            kø.leggInn(valgt);
+            while (!stakk.tom()) kø.leggInn(stakk.taUt());
+            while (!kø.tom()) stakk.leggInn(kø.taUt());
+            while (!stakk.tom()) kø.leggInn(stakk.taUt());
+            n--;
+        }
+    }
+    public static <T> void sorter(Stakk<T> A, Comparator<? super T> c){
+        Stakk<T> B = new TabellStakk<>();
+
+        int n = A.antall();
+        for(int i = 0; i < A.antall(); i++){
+            T valgt = A.taUt();
+            for(int j = 1; j < n; j++){
+                T temp = A.taUt();
+                int k = c.compare(valgt, temp);
+                if(k <= 0){
+                    B.leggInn(valgt);
+                    valgt = temp;
+                }else{
+                    B.leggInn(temp);
+                }
+            }
+            A.leggInn(valgt);
+            while (!B.tom()) A.leggInn(B.taUt());
+            n--;
+        }
     }
 }
