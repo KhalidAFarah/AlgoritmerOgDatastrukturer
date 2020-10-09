@@ -90,7 +90,7 @@ public class TabellKø<T> implements Kø<T>
 
         if(!tom()){
             ut += a[fra];
-            for(int i = fra; i <= til ; i++){
+            for(int i = fra+1; i < til ; i++){
                 ut += ", " + a[i % a.length];
             }
         }

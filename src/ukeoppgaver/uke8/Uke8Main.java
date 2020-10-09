@@ -10,8 +10,6 @@ public class Uke8Main {
         avsnitt422();
     }
 
-
-
     private static void avsnitt412(){
         Stakk<Integer> A = new TabellStakk<>(3);
         A.leggInn(1);
@@ -57,7 +55,6 @@ public class Uke8Main {
         System.out.println(B.toString());
         TabellKø.snu2(B);
         System.out.println(B);
-
     }
 
     private static void avsnitt424(){
