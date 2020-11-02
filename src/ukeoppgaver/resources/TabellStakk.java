@@ -28,7 +28,7 @@ public class TabellStakk<T> implements Stakk<T>
 
     @Override
     public T kikk() {
-        return null;
+        return a[antall-1];
     }
 
     @Override
