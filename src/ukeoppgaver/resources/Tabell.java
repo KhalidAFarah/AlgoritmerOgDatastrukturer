@@ -836,4 +836,57 @@ public class Tabell { // Samleklasse for tabellmetoder
             n--;
         }
     }
+    public static <T> T maks(Kø<T> kø, Comparator<? super T> c){
+        T maks = kø.kikk();
+        for(int i = 0; i < kø.antall()-1; i++){
+            kø.leggInn(kø.taUt());
+            if(c.compare(maks, kø.kikk()) < 0){
+                maks = kø.kikk();
+            }
+        }
+        return maks;
+    }
+    public static int[] indeksTabell(char[] c){
+        int[] indekstabell = new int[c.length];
+        for(int i = 0; i < c.length; i++){
+            int m = 0;
+            char min = c[i];
+
+
+            for(int j = 0; j < c.length; j++){
+                if(min > c[j]) m++;
+            }
+            indekstabell[m] = i;
+
+        }
+        return indekstabell;
+    }
+    public static int hash(String a, String b){
+        char[] charsA = a.toCharArray();
+        char[] charsB = b.toCharArray();
+        String hash = "";
+
+        for(int i = 0; i < charsA.length || i < charsB.length; i++){
+            if(i < charsA.length){
+                hash += charsA[i];
+            }if(i < charsB.length){
+                hash += charsB[i];
+            }
+        }
+        return hash.hashCode();
+    }
+
+    public static boolean inneholdti(char[] a, char[] b){
+        for(int i = 0; i < a.length; i++){
+            int n = 0;
+            int nValue = a[i];
+            for(char value : a) if(value == nValue) n++;
+
+            for(char value : b) if(value == nValue) n--;
+
+            if(n > 0) return false;
+        }
+        return true;
+
+    }
 }

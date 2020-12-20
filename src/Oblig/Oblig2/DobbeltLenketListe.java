@@ -1,4 +1,4 @@
-package no.oslomet.cs.algdat;
+package Oblig.Oblig2;
 
 
 ////////////////// class DobbeltLenketListe //////////////////////////////
@@ -192,7 +192,7 @@ public class DobbeltLenketListe<T> implements Liste<T> {
                 return hale;
 
             Node<T> currentNode = hale;
-            for(int i = antall; i >= index; i--){
+            for(int i = antall-2; i >= index; i--){
                 if(currentNode.forrige != null)
                 currentNode = currentNode.forrige;
             }
@@ -279,7 +279,7 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     public T fjern(int indeks) {
         indeksKontroll(indeks, false);
 
-        if(indeks == antall()-1){
+        if(indeks == antall-1){
             if(indeks == 0){
                 T temp = hode.verdi;
                 hode = null;
@@ -442,13 +442,46 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
         @Override
         public void remove(){
-            throw new UnsupportedOperationException();
+            if(iteratorendringer != endringer)
+                throw new ConcurrentModificationException("Iterator endringer og endringer er like");
+            if(!fjernOK)
+                throw new IllegalStateException("kan ikke fjerne element");
+
+            fjernOK = false;
+
+            if(antall == 1){
+                hode = null; hale = null; denne = null;
+            }else if(denne == null){
+                hale = hale.forrige;
+                hale.neste = null;
+            } else if(hode == denne.forrige){
+                hode = hode.neste;
+                hode.forrige = null;
+            }else{
+                denne.forrige.forrige.neste = denne;
+                denne.forrige = denne.forrige.forrige;
+            }
+            antall--;
+            iteratorendringer++;
+            endringer++;
         }
 
     } // class DobbeltLenketListeIterator
 
     public static <T> void sorter(Liste<T> liste, Comparator<? super T> c) {
-        throw new UnsupportedOperationException();
+        boolean ferdig = true;
+        do{
+            ferdig = true;
+            for (int i = 0; i < liste.antall()-1; i++){
+                int cmp = c.compare(liste.hent(i), liste.hent(i+1));
+                if(cmp > 0){
+                    ferdig = false;
+                    T temp = liste.hent(i);
+                    liste.oppdater(i, liste.hent(i+1));
+                    liste.oppdater(i+1, temp);
+                }
+            }
+        }while (!ferdig);
     }
 
 } // class DobbeltLenketListe

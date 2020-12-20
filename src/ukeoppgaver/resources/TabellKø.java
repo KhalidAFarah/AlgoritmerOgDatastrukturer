@@ -142,4 +142,22 @@ public class TabellKø<T> implements Kø<T>
         while (!C.tom()) A.leggInn(C.taUt());
     }
 
+    public static <T> void byttPlass(Kø<T> kø, int indeks){
+        if(kø.antall() <= indeks) return;
+        TabellKø<T> hjelpekø = new TabellKø(kø.antall());
+
+        for(int i = indeks; i > 0; i--){
+            hjelpekø.leggInn(kø.taUt());
+        }
+        T temp = kø.taUt();
+        hjelpekø.leggInn(kø.taUt());
+        hjelpekø.leggInn(temp);
+        while (!kø.tom()) hjelpekø.leggInn(kø.taUt());
+        while (!hjelpekø.tom()){
+            kø.leggInn(hjelpekø.taUt());
+        }
+
+
+    }
+
 } // class TabellKø

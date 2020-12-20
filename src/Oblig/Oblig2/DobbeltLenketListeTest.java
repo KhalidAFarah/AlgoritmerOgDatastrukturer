@@ -1,4 +1,4 @@
-package no.oslomet.cs.algdat;
+package Oblig.Oblig2;
 
 import java.util.*;
 
@@ -1297,6 +1297,7 @@ class DobbeltLenketListeTest {
             System.out.println("Oppgave 10d: Feil for listen C, B, A!");
             antallFeil++;
         }
+
 
         liste = new DobbeltLenketListe<>(new String[]{"G", "B", "F", "C", "E", "D", "A"});
         DobbeltLenketListe.sorter(liste, Comparator.naturalOrder());

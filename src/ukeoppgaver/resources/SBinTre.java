@@ -1,10 +1,12 @@
 package ukeoppgaver.resources;
 
+import java.net.SocketTimeoutException;
 import java.util.*;
 import java.util.stream.Stream;
 
 public class SBinTre<T> implements Beholder<T>
 {
+
     private static final class Node<T> // en indre nodeklasse
     {
         private T verdi;                 // nodens verdi
@@ -93,6 +95,47 @@ public class SBinTre<T> implements Beholder<T>
             høyde(node.høyre, o, posisjon++);
         if(node.venstre != null)
             høyde(node.venstre, o, posisjon++);
+    }
+
+    public int dybde(T verdi){
+        Node<T> p = rot;
+        int dybde = 0;
+        while(p != null){
+            int cmp = comp.compare(verdi, p.verdi);
+            if(cmp > 0) p = p.høyre;
+            else if(cmp < 0) p = p.venstre;
+            else return dybde;
+            dybde++;
+        }
+        return -1;
+    }
+
+    public int diameter(){
+        int gren1 = 0, gren2 = 0, maks1 = 0, maks2 = 0;
+        Node<T> p = rot;
+        Stakk<Node<T>> stakk = new TabellStakk<>(antall);
+        while (p != null){
+            if(p.venstre != null){
+                if(p.høyre != null){
+                    stakk.leggInn(p.høyre);
+                }
+            }
+        }
+
+        return gren1 + gren2;
+        /*int diameter = -1;
+
+        // For-alle-løkkene virker fordi SBinTre er iterable
+        for (T verdi1 : this)
+        {
+            for (T verdi2 : this)
+            {
+                int avstand = avstand(verdi1, verdi2);
+                if (avstand > diameter) diameter = avstand;
+            }
+        }
+
+        return diameter;*/
     }
 
 
@@ -583,6 +626,202 @@ public class SBinTre<T> implements Beholder<T>
 
     public Iterator<T> riterator(){
         return new omvendtInordenIterator();
+    }
+
+    public int avstand(T verdi1, T verdi2){
+        Objects.requireNonNull(verdi1);
+        Objects.requireNonNull(verdi2);
+        if(verdi1.equals(verdi2)) return 0;
+
+        Node<T> p = rot, q = null;
+        int venstre = 0, høyre = 0;
+
+        while (p != null){
+            int cmp1 = comp.compare(verdi1, p.verdi);
+            int cmp2 = comp.compare(verdi2, p.verdi);
+
+            if(cmp1 == cmp2) {
+                if (cmp1 > 0 && cmp2 > 0) p = p.høyre;
+                else if (cmp1 < 0 && cmp2 < 0) p = p.venstre;
+            }else {
+                q = p;
+                while (p != null){
+                    cmp1 = comp.compare(verdi1, p.verdi);
+
+                    if(cmp1 > 0) p = p.høyre;
+                    else if(cmp1 < 0) p = p.venstre;
+                    else break;
+
+                    venstre++;
+                }
+
+                p = q;
+                while (p != null){
+                    cmp1 = comp.compare(verdi2, p.verdi);
+
+                    if(cmp1 > 0) p = p.høyre;
+                    else if(cmp1 < 0) p = p.venstre;
+                    else break;
+
+                    høyre++;
+                }
+                return venstre + høyre;
+            }
+
+        }
+        return 0;
+    }
+
+    public T nestMinst(){
+        if(antall >= 2){
+            Node<T> p = rot;
+            Node<T> q = null;
+            while (p.høyre != null || p.venstre != null){
+                if(p.venstre != null){
+                    q = p;
+                    p = p.venstre;
+                }else if(p.høyre != null){
+                    q = p;
+                    p = p.høyre;
+                }
+            }
+            if(q.venstre == p){
+                if(q.høyre == null){
+                    return q.verdi;
+                }else{
+                    p = q;
+                    while (p.høyre != null || p.venstre != null){
+                        if(p.venstre != null){
+                            q = p;
+                            p = p.venstre;
+                        }else if(p.høyre != null){
+                            q = p;
+                            p = p.høyre;
+                        }
+                    }
+                    return p.verdi;
+                }
+            }else{
+                return q.verdi;
+            }
+        } return null;
+    }
+
+    public T avstand2(T verdi, int d){
+        Node<T> p = rot;
+        while(p != null){
+            int cmp = comp.compare(verdi, p.verdi);
+            if(cmp > 0){
+                p = p.høyre;
+            }else if(cmp < 0){
+                p = p.venstre;
+            }else{
+                T maks;
+                Node<T> q = p;
+
+                while(q != null && d != 0){
+                    if(q.høyre != null){
+                        q = q.høyre;
+                        d--;
+                    }else if(q.venstre != null){
+                        q = q.venstre;
+                    }
+                }
+                return q.verdi;
+            }
+        }
+        return null;
+    }
+    public String omvendtPreString(){
+        StringJoiner joiner = new StringJoiner(", ", "[", "]");
+        Node<T> p = rot;
+        TabellStakk<Node<T>> stakk = new TabellStakk<>();
+        while (p != null){
+            stakk.leggInn(p);
+            if(p.høyre != null) p = p.høyre;
+            else if(p.venstre != null) p = p.venstre;
+            else break;
+        }
+        stakk.taUt();
+
+        while (!stakk.tom()){
+            joiner.add(p.verdi.toString());
+
+            if(p == stakk.kikk().høyre){
+                if(stakk.kikk().venstre != null){
+                    p = stakk.kikk().venstre;
+                    while (p != null) {
+                        stakk.leggInn(p);
+                        if (p.høyre != null) p = p.høyre;
+                        else if (p.venstre != null) p = p.venstre;
+                        else break;
+                    }
+                    stakk.taUt();
+                }else{
+                    p = stakk.taUt();
+                }
+            }else if(p == stakk.kikk().venstre){
+                p = stakk.taUt();
+            }
+        }
+        if(rot != null) joiner.add(rot.verdi.toString());
+
+        return joiner.toString();
+    }
+
+    public String lengstGren(){
+        if(tom()) return "[]";
+        StringJoiner joiner = new StringJoiner(", ", "[", "]");
+        Kø<Node<T>> kø = new TabellKø<>();
+        kø.leggInn(rot);
+        Node<T> p = null;
+        while (!kø.tom()){
+            p = kø.taUt();
+
+            if(p.venstre != null) kø.leggInn(p.venstre);
+            if(p.høyre != null) kø.leggInn(p.høyre);
+        }
+
+        T verdi = p.verdi;
+        p = rot;
+        while (p != null){
+            joiner.add(p.verdi.toString());
+            int cmp = comp.compare(verdi, p.verdi);
+            if(cmp > 0) p = p.høyre;
+            else if(cmp < 0) p = p.venstre;
+            else{
+                break;
+            }
+        }
+        return joiner.toString();
+    }
+
+    public String kortestGren(){
+        if(tom()) return "[]";
+        StringJoiner joiner = new StringJoiner(", ", "[", "]");
+        Kø<Node<T>> kø = new TabellKø<>();
+        kø.leggInn(rot);
+        Node<T> p = null;
+        while (!kø.tom()){
+            p = kø.taUt();
+
+            if(p.venstre == null && p.høyre == null) break;
+            if(p.venstre != null) kø.leggInn(p.venstre);
+            if(p.høyre != null) kø.leggInn(p.høyre);
+        }
+
+        T verdi = p.verdi;
+        p = rot;
+        while (p != null){
+            joiner.add(p.verdi.toString());
+            int cmp = comp.compare(verdi, p.verdi);
+            if(cmp > 0) p = p.høyre;
+            else if(cmp < 0) p = p.venstre;
+            else{
+                break;
+            }
+        }
+        return joiner.toString();
     }
 
 
